@@ -1,4 +1,5 @@
 import math
+from Tkinter import *
 
 def getMatrix():
 	L = [None] * 3
@@ -27,7 +28,7 @@ def PrintMatrix(L):
 	s ="["+str(L[2][0])+","+str(L[2][1])+","+str(L[2][2])+"]"
 	print s
 
-def MatrixProduct(L,M):
+def MatrixProduct(L, M):
 	result = [[0,0,0],[0,0,0],[0,0,0]]
 	for i in range(len(L)):
 		for j in range(len(M[0])):
@@ -35,7 +36,7 @@ def MatrixProduct(L,M):
 				result[i][j] += L[i][k] * M[k][j]
 	return result
 
-def MatrixPointProduct(L,P):
+def MatrixPointProduct(L, P):
 	result = [0,0,0]
 	for i in range(len(L)):
 		for j in range(len(P)):
@@ -54,23 +55,62 @@ def GenHomothetieMatrix(k):
 		[0,0,1]]
 	return L
 
-def GenTranslationMatrix(a,b):
+def GenTranslationMatrix(a, b):
 	L = [[1,0,a],
 		[0,1,b],
 		[0,0,1]]
 	return L
 
-def GenCentredRotationMatrix(teta,a,b):
-	return MatrixProduct(GenRotationMatrix(teta),GenTranslationMatrix(a,b))
+def GenCentredRotationMatrix(teta, a, b):
+	return MatrixProduct(MatrixProduct(GenRotationMatrix(teta),GenTranslationMatrix(-a,-b)), GenTranslationMatrix(a,b))
 
-def GenCentredHomothetieMatrix(k,a,b):
-	return MatrixProduct(GenHomothetieMatrix(k),GenTranslationMatrix(a,b))
+def GenCentredHomothetieMatrix(k, a, b):
+	return MatrixProduct(MatrixProduct(GenHomothetieMatrix(k),GenTranslationMatrix(-a,-b)), GenTranslationMatrix(a,b))
 
-def GetPolyon():
+def GetPolygon():
 	nb = input("Combien de point voulez vous ?")
 	L = [None] * nb
 	for i in range(nb):
 		L[i] = getPoint()
 	return L
 
-GetPolyon()
+def GetFace():
+	nb = input("Combien de polygone voulez vous ?")
+	L = [None] * nb
+	for i in range(nb):
+		L[i] = GetPolygon()
+	return L
+def addPoint(polygon, a, b):
+	L = [None] * (len(polygon) + 1)
+	for i in range(len(polygon)):
+		L[i] = polygon[i]
+	L[len(polygon)] =  [None] * 3
+	L[len(polygon)][0] = a
+	L[len(polygon)][1] = b
+	L[len(polygon)][2] = 1
+	return L
+
+def addPolygon(face, polygon):
+	L = [None] * (len(face) + 1)
+	for i in range(len(face)):
+		L[i] = face[i]
+	L[len(face)] =  polygon
+	return L
+
+def ApplyModif(face, matrix):
+	for i in range(len(face)):
+		for j in range(len(face[i])):
+			face[i][j] = MatrixPointProduct(matrix, face[i][j])
+	return face
+
+def DisplayFace(face):
+	fenetre=Tk()
+	can = Canvas(fenetre,height=720,width=1280)
+	for i in range(len(face)):
+		for j in range(len(face[i])):
+			if j % 2 == 0 and (j % 2 +1) != len(face[i]):
+				can.create_line(face[i][j][0],face[i][j][1],face[i][j+1][0],face[i][j+1][1],width=2, fill='black')
+	can.pack()
+	fenetre.mainloop()
+
+DisplayFace(GetFace())
