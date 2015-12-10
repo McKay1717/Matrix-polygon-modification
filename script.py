@@ -73,13 +73,13 @@ def GenTranslationMatrix(a, b):
 
 
 def GenCentredRotationMatrix(teta, a, b):
-    return MatrixProduct(MatrixProduct(GenRotationMatrix(teta), GenTranslationMatrix(-a, -b)),
-                         GenTranslationMatrix(a, b))
+    return MatrixProduct(GenTranslationMatrix(a, b),
+                         MatrixProduct(GenRotationMatrix(teta), GenTranslationMatrix(-a, -b)))
 
 
 def GenCentredHomothetieMatrix(k, a, b):
-    return MatrixProduct(MatrixProduct(GenHomothetieMatrix(k), GenTranslationMatrix(-a, -b)),
-                         GenTranslationMatrix(a, b))
+    return MatrixProduct(GenTranslationMatrix(a, b),
+                         MatrixProduct(GenHomothetieMatrix(k), GenTranslationMatrix(-a, -b)))
 
 
 def GetPolygon():
@@ -129,11 +129,16 @@ def DisplayFace(face):
     can = Canvas(fenetre, height=720, width=1280)
     for i in range(len(face)):
         for j in range(len(face[i])):
-            if j % 2 == 0 and (j % 2 + 1) != len(face[i]):
-                can.create_line(face[i][j][0], face[i][j][1], face[i][j + 1][0], face[i][j + 1][1], width=2,
+            test = j +1
+            if test >= len(face[i]):
+                test = 0
+            can.create_line(face[i][j][0], face[i][j][1], face[i][test][0], face[i][test][1], width=2,
                                 fill='black')
     can.pack()
     fenetre.mainloop()
 
 
-DisplayFace(GetFace())
+Face = [[[750.0, 249.99999999999997, 1.0], [500.0, 249.99999999999997, 1.0], [750.0, 499.99999999999994, 1.0]]]
+ApplyModif(Face, GenCentredRotationMatrix(math.radians(180), 500, 500))
+print Face
+DisplayFace(Face)
